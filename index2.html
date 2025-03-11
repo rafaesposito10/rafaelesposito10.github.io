@@ -130,11 +130,11 @@
 
         // Função para limpar cookies específicos do Hyperflow
         function clearHyperflowCookies() {
-            const hyperflowCookies = ['hyperflow_session', 'hyperflow_user']; // Substitua pelos nomes reais dos cookies do Hyperflow
+            const hyperflowCookies = ['fingerprint']; // Substitua pelos nomes reais dos cookies do Hyperflow
 
             hyperflowCookies.forEach(cookieName => {
                 // Define o cookie para expirar no passado
-                document.cookie = `${cookieName}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+                document.cookie = `${cookieName}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;domain=https://webchat.hyperflow.global`;
                 // Se os cookies têm um domínio específico, inclua a propriedade 'domain'
                 // document.cookie = `${cookieName}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;domain=seu-dominio.com;`;
             });
