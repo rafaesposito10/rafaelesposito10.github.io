@@ -15,11 +15,19 @@
             padding: 20px;
         }
 
-        /* Estilos para o botão de alternância */
-        .toggle-button {
+        /* Contêiner para os botões fixos */
+        .fixed-buttons {
             position: fixed;
             top: 20px;
             right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000; /* Assegura que os botões fiquem sobre outros elementos */
+        }
+
+        /* Estilos para os botões de alternância e limpeza */
+        .fixed-buttons button {
             background-color: #444;
             border: none;
             color: #fff;
@@ -27,9 +35,13 @@
             cursor: pointer;
             border-radius: 5px;
             transition: background-color 0.3s, color 0.3s;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .toggle-button:hover {
+        .fixed-buttons button:hover {
             background-color: #555;
         }
 
@@ -39,19 +51,34 @@
             color: #000;
         }
 
-        .light-mode .toggle-button {
+        .light-mode .fixed-buttons button {
             background-color: #ddd;
             color: #000;
         }
 
-        .light-mode .toggle-button:hover {
+        .light-mode .fixed-buttons button:hover {
             background-color: #ccc;
+        }
+
+        /* Ícones nos botões */
+        .button-icon {
+            margin-right: 8px;
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
-    <!-- Botão de Alternância -->
-    <button class="toggle-button" id="theme-toggle">🌙 Modo Escuro</button>
+    <!-- Contêiner para os Botões Fixos -->
+    <div class="fixed-buttons">
+        <!-- Botão de Alternância de Tema -->
+        <button class="toggle-button" id="theme-toggle">
+            <span class="button-icon">🌙</span>Modo Escuro
+        </button>
+        <!-- Botão de Limpar Cookies -->
+        <button class="clear-cookies-button" id="clear-cookies">
+            <span class="button-icon">🧹</span>Limpar Cookies
+        </button>
+    </div>
 
     <!-- Seu conteúdo existente -->
     <script src="https://webchat.hyperflow.global/sdk.js"></script>
@@ -66,17 +93,19 @@
             });
     </script>
 
-    <!-- Script para alternar temas -->
+    <!-- Scripts para funcionalidade dos botões -->
     <script>
+        // Seleção dos elementos
         const toggleButton = document.getElementById('theme-toggle');
+        const clearCookiesButton = document.getElementById('clear-cookies');
         const bodyElement = document.body;
 
-        // Função para atualizar o texto do botão
-        function updateButton() {
+        // Função para atualizar o texto do botão de tema
+        function updateThemeButton() {
             if (bodyElement.classList.contains('light-mode')) {
-                toggleButton.textContent = '🌙 Modo Escuro';
+                toggleButton.innerHTML = '<span class="button-icon">🌙</span>Modo Escuro';
             } else {
-                toggleButton.textContent = '☀️ Modo Claro';
+                toggleButton.innerHTML = '<span class="button-icon">☀️</span>Modo Claro';
             }
         }
 
@@ -85,7 +114,7 @@
             bodyElement.classList.add('light-mode');
         }
 
-        updateButton();
+        updateThemeButton();
 
         // Evento de clique para alternar o tema
         toggleButton.addEventListener('click', () => {
@@ -96,7 +125,27 @@
             } else {
                 localStorage.setItem('theme', 'dark');
             }
-            updateButton();
+            updateThemeButton();
+        });
+
+        // Função para limpar todos os cookies
+        function clearAllCookies() {
+            const cookies = document.cookie.split(";");
+
+            for (let cookie of cookies) {
+                const eqPos = cookie.indexOf("=");
+                const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+                // Define o cookie para expirar no passado
+                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;";
+            }
+        }
+
+        // Evento de clique para limpar cookies e recarregar a página
+        clearCookiesButton.addEventListener('click', () => {
+            if (confirm('Tem certeza que deseja limpar todos os cookies?')) {
+                clearAllCookies();
+                location.reload();
+            }
         });
     </script>
 </body>
