@@ -1,23 +1,152 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hyperflow Embed</title>
+    <style>
+        /* Estilos padrão (Modo Escuro) */
+        body {
+            background-color: #333;
+            color: #fff;
+            transition: background-color 0.3s, color 0.3s;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
 
+        /* Contêiner para os botões fixos */
+        .fixed-buttons {
+            position: fixed;
+            top: 20px;
+            left: 20px; /* Alinhado à esquerda */
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000; /* Assegura que os botões fiquem sobre outros elementos */
+        }
+
+        /* Estilos para os botões de alternância e limpeza */
+        .fixed-buttons button {
+            background-color: #444;
+            border: none;
+            color: #fff;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fixed-buttons button:hover {
+            background-color: #555;
+        }
+
+        /* Modo Claro */
+        body.light-mode {
+            background-color: #f0f0f0;
+            color: #000;
+        }
+
+        .light-mode .fixed-buttons button {
+            background-color: #ddd;
+            color: #000;
+        }
+
+        .light-mode .fixed-buttons button:hover {
+            background-color: #ccc;
+        }
+
+        /* Ícones nos botões */
+        .button-icon {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
-<script src=https://webchat.hyperflow.global/sdk.js></script>
-<script>Hyperflow.init("33b8d7c6d1a5b345a840b20b8d5aa1cb")
-/* .on("getStarted", () => {
-        Hyperflow.initFlow('3Q5qRS7gs', { 
-            url: window.location.href,
-            payload: {
-                email: 'rafael.esposito@eduzz.com.br',
-                name: 'Rafael Esposito'
+    <!-- Contêiner para os Botões Fixos -->
+    <div class="fixed-buttons">
+        <!-- Botão de Alternância de Tema -->
+        <button class="toggle-button" id="theme-toggle">
+            <span class="button-icon">🌙</span>Modo Escuro
+        </button>
+        <!-- Botão de Limpar Cookies -->
+        <button class="clear-cookies-button" id="clear-cookies">
+            <span class="button-icon">🧹</span>Limpar Cookies
+        </button>
+    </div>
+
+    <!-- Seu conteúdo existente -->
+    <script src="https://webchat.hyperflow.global/sdk.js"></script>
+    <script>
+        Hyperflow.init("c387c02fc74a9b9e69b9da2105b14748")
+            .on("getStarted", () => {
+                Hyperflow.initFlow("bxgvcITqw", { 
+                    url: window.location.href,
+                    email: 'rafael.esposito@eduzz.com.br',
+                    env: 'dev'
+                });
+            });
+    </script>
+
+    <!-- Scripts para funcionalidade dos botões -->
+    <script>
+        // Seleção dos elementos
+        const toggleButton = document.getElementById('theme-toggle');
+        const clearCookiesButton = document.getElementById('clear-cookies');
+        const bodyElement = document.body;
+
+        // Função para atualizar o texto do botão de tema
+        function updateThemeButton() {
+            if (bodyElement.classList.contains('light-mode')) {
+                toggleButton.innerHTML = '<span class="button-icon">🌙</span>Modo Escuro';
+            } else {
+                toggleButton.innerHTML = '<span class="button-icon">☀️</span>Modo Claro';
+            }
+        }
+
+        // Verificar preferência salva no localStorage
+        if (localStorage.getItem('theme') === 'light') {
+            bodyElement.classList.add('light-mode');
+        }
+
+        updateThemeButton();
+
+        // Evento de clique para alternar o tema
+        toggleButton.addEventListener('click', () => {
+            bodyElement.classList.toggle('light-mode');
+            // Salvar preferência no localStorage
+            if (bodyElement.classList.contains('light-mode')) {
+                localStorage.setItem('theme', 'light');
+            } else {
+                localStorage.setItem('theme', 'dark');
+            }
+            updateThemeButton();
+        });
+
+        // Função para limpar cookies específicos do Hyperflow
+        function clearHyperflowCookies() {
+            const hyperflowCookies = ['fingerprint']; // Substitua pelos nomes reais dos cookies do Hyperflow
+
+            hyperflowCookies.forEach(cookieName => {
+                // Define o cookie para expirar no passado
+                document.cookie = `${cookieName}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;domain=https://webchat.hyperflow.global`;
+                // Se os cookies têm um domínio específico, inclua a propriedade 'domain'
+                // document.cookie = `${cookieName}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;domain=seu-dominio.com;`;
+            });
+        }
+
+        // Evento de clique para limpar cookies do Hyperflow e recarregar a página
+        clearCookiesButton.addEventListener('click', () => {
+            if (confirm('Tem certeza que deseja limpar os cookies do Hyperflow?')) {
+                clearHyperflowCookies();
+                location.reload();
             }
         });
-    }); */
-</script>
+    </script>
 </body>
 </html>
