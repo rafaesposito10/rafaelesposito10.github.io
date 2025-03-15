@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,11 +20,13 @@
         .fixed-buttons {
             position: fixed;
             top: 20px;
-            left: 20px; /* Alinhado à esquerda */
+            left: 20px;
+            /* Alinhado à esquerda */
             display: flex;
             flex-direction: column;
             gap: 10px;
-            z-index: 1000; /* Assegura que os botões fiquem sobre outros elementos */
+            z-index: 1000;
+            /* Assegura que os botões fiquem sobre outros elementos */
         }
 
         /* Estilos para os botões de alternância e limpeza */
@@ -60,6 +63,23 @@
             background-color: #ccc;
         }
 
+        .button {
+            display: block;
+            /* organiza os botões de cima para baixo */
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            /* adiciona um espaçamento de 20px entre os botões */
+        }
+
+        .button:hover {
+            background-color: #3e8e41;
+        }
+
         /* Ícones nos botões */
         .button-icon {
             margin-right: 8px;
@@ -67,59 +87,61 @@
         }
     </style>
 </head>
+
 <body>
-        <!-- Contêiner para os Botões Fixos -->
-        <div class="fixed-buttons">
-            <!-- Botão de Alternância de Tema -->
-            <button class="toggle-button" id="theme-toggle">
-                <span class="button-icon">🌙</span>Modo Escuro
-            </button>
-        </div>
-        <div class="fixed-buttons">
-            <button class="button-icon" onclick="window.location.href='index2.html'">Página 2</button>
-        </div>
-        <div class="fixed-buttons">
-            <button class="button-icon" onclick="window.location.href='index3.html'">Página 3</button>
-        </div>
+    <!-- Contêiner para os Botões Fixos -->
+    <div class="fixed-buttons">
+        <!-- Botão de Alternância de Tema -->
+        <button class="toggle-button" id="theme-toggle">
+            <span class="button-icon">🌙</span>Modo Escuro
+        </button>
+    </div>
+    <div class="fixed-buttons">
+        <button class="button-icon" onclick="window.location.href='index2.html'">Página 2</button>
+    </div>
+    <div class="fixed-buttons">
+        <button class="button-icon" onclick="window.location.href='index3.html'">Página 3</button>
+    </div>
 
 
-<script src=https://webchat.hyperflow.global/sdk.js></script>
-<script>Hyperflow.init("67ba37fe062b6bf7aaeff7ca41185b56")</script>
+    <script src=https://webchat.hyperflow.global/sdk.js></script>
+    <script>Hyperflow.init("67ba37fe062b6bf7aaeff7ca41185b56")</script>
 
 
-   <!-- Scripts para funcionalidade dos botões -->
-   <script>
-    // Seleção dos elementos
-    const toggleButton = document.getElementById('theme-toggle');
-    const bodyElement = document.body;
+    <!-- Scripts para funcionalidade dos botões -->
+    <script>
+        // Seleção dos elementos
+        const toggleButton = document.getElementById('theme-toggle');
+        const bodyElement = document.body;
 
-    // Função para atualizar o texto do botão de tema
-    function updateThemeButton() {
-        if (bodyElement.classList.contains('light-mode')) {
-            toggleButton.innerHTML = '<span class="button-icon">🌙</span>Modo Escuro';
-        } else {
-            toggleButton.innerHTML = '<span class="button-icon">☀️</span>Modo Claro';
+        // Função para atualizar o texto do botão de tema
+        function updateThemeButton() {
+            if (bodyElement.classList.contains('light-mode')) {
+                toggleButton.innerHTML = '<span class="button-icon">🌙</span>Modo Escuro';
+            } else {
+                toggleButton.innerHTML = '<span class="button-icon">☀️</span>Modo Claro';
+            }
         }
-    }
 
-    // Verificar preferência salva no localStorage
-    if (localStorage.getItem('theme') === 'light') {
-        bodyElement.classList.add('light-mode');
-    }
-
-    updateThemeButton();
-
-    // Evento de clique para alternar o tema
-    toggleButton.addEventListener('click', () => {
-        bodyElement.classList.toggle('light-mode');
-        // Salvar preferência no localStorage
-        if (bodyElement.classList.contains('light-mode')) {
-            localStorage.setItem('theme', 'light');
-        } else {
-            localStorage.setItem('theme', 'dark');
+        // Verificar preferência salva no localStorage
+        if (localStorage.getItem('theme') === 'light') {
+            bodyElement.classList.add('light-mode');
         }
+
         updateThemeButton();
-    });
-</script>
+
+        // Evento de clique para alternar o tema
+        toggleButton.addEventListener('click', () => {
+            bodyElement.classList.toggle('light-mode');
+            // Salvar preferência no localStorage
+            if (bodyElement.classList.contains('light-mode')) {
+                localStorage.setItem('theme', 'light');
+            } else {
+                localStorage.setItem('theme', 'dark');
+            }
+            updateThemeButton();
+        });
+    </script>
 </body>
+
 </html>
