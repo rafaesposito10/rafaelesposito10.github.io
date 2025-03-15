@@ -11,9 +11,59 @@
     </style>
 </head>
 <body>
+        <!-- Contêiner para os Botões Fixos -->
+        <div class="fixed-buttons">
+            <!-- Botão de Alternância de Tema -->
+            <button class="toggle-button" id="theme-toggle">
+                <span class="button-icon">🌙</span>Modo Escuro
+            </button>
+        </div>
+        <div class="fixed-buttons">
+            <button class="button-icon" onclick="window.location.href='index2.html'">Página 2</button>
+        </div>
+        <div class="fixed-buttons">
+            <button class="button-icon" onclick="window.location.href='index3.html'">Página 3</button>
+        </div>
+
+
+<button onclick="window.location.href='index3.html'">Página 3</button>
 <script src=https://webchat.hyperflow.global/sdk.js></script>
 <script>Hyperflow.init("67ba37fe062b6bf7aaeff7ca41185b56")</script>
-<button onclick="window.location.href='index2.html'">Página 2</button>
-<button onclick="window.location.href='index3.html'">Página 3</button>
+
+
+   <!-- Scripts para funcionalidade dos botões -->
+   <script>
+    // Seleção dos elementos
+    const toggleButton = document.getElementById('theme-toggle');
+    const bodyElement = document.body;
+
+    // Função para atualizar o texto do botão de tema
+    function updateThemeButton() {
+        if (bodyElement.classList.contains('light-mode')) {
+            toggleButton.innerHTML = '<span class="button-icon">🌙</span>Modo Escuro';
+        } else {
+            toggleButton.innerHTML = '<span class="button-icon">☀️</span>Modo Claro';
+        }
+    }
+
+    // Verificar preferência salva no localStorage
+    if (localStorage.getItem('theme') === 'light') {
+        bodyElement.classList.add('light-mode');
+    }
+
+    updateThemeButton();
+
+    // Evento de clique para alternar o tema
+    toggleButton.addEventListener('click', () => {
+        bodyElement.classList.toggle('light-mode');
+        // Salvar preferência no localStorage
+        if (bodyElement.classList.contains('light-mode')) {
+            localStorage.setItem('theme', 'light');
+        } else {
+            localStorage.setItem('theme', 'dark');
+        }
+        updateThemeButton();
+    });
+</script>
 </body>
 </html>
