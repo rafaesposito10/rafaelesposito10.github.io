@@ -5,8 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hyperflow Embed</title>
     <style>
+        /* Estilos padrão (Modo Escuro) */
         body {
             background-color: #333;
+            color: #fff;
+            transition: background-color 0.3s, color 0.3s;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* Contêiner para os botões fixos */
+        .fixed-buttons {
+            position: fixed;
+            top: 20px;
+            left: 20px; /* Alinhado à esquerda */
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000; /* Assegura que os botões fiquem sobre outros elementos */
+        }
+
+        /* Estilos para os botões de alternância e limpeza */
+        .fixed-buttons button {
+            background-color: #444;
+            border: none;
+            color: #fff;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fixed-buttons button:hover {
+            background-color: #555;
+        }
+
+        /* Modo Claro */
+        body.light-mode {
+            background-color: #f0f0f0;
+            color: #000;
+        }
+
+        .light-mode .fixed-buttons button {
+            background-color: #ddd;
+            color: #000;
+        }
+
+        .light-mode .fixed-buttons button:hover {
+            background-color: #ccc;
+        }
+
+        /* Ícones nos botões */
+        .button-icon {
+            margin-right: 8px;
+            font-size: 16px;
         }
     </style>
 </head>
