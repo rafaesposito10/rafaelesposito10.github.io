@@ -74,10 +74,6 @@
         <button class="toggle-button" id="theme-toggle">
             <span class="button-icon">🌙</span>Modo Escuro
         </button>
-        <!-- Botão de Limpar Cookies -->
-        <button class="clear-cookies-button" id="clear-cookies">
-            <span class="button-icon">🧹</span>Limpar Cookies
-        </button>
     </div>
 
     <!-- Seu conteúdo existente -->
@@ -126,26 +122,6 @@
                 localStorage.setItem('theme', 'dark');
             }
             updateThemeButton();
-        });
-
-        // Função para limpar cookies específicos do Hyperflow
-        function clearHyperflowCookies() {
-            const hyperflowCookies = ['fingerprint']; // Substitua pelos nomes reais dos cookies do Hyperflow
-
-            hyperflowCookies.forEach(cookieName => {
-                // Define o cookie para expirar no passado
-                document.cookie = `${cookieName}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;domain=https://webchat.hyperflow.global`;
-                // Se os cookies têm um domínio específico, inclua a propriedade 'domain'
-                // document.cookie = `${cookieName}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;domain=seu-dominio.com;`;
-            });
-        }
-
-        // Evento de clique para limpar cookies do Hyperflow e recarregar a página
-        clearCookiesButton.addEventListener('click', () => {
-            if (confirm('Tem certeza que deseja limpar os cookies do Hyperflow?')) {
-                clearHyperflowCookies();
-                location.reload();
-            }
         });
     </script>
 </body>
