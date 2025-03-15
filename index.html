@@ -14,15 +14,15 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
+
         }
 
         /* Contêiner para os botões fixos */
         .fixed-buttons {
-            position: fixed;
             top: 20px;
             left: 20px;
             /* Alinhado à esquerda */
-            display: flex;
+            display: inline-flex;
             flex-direction: column;
             gap: 10px;
             z-index: 1000;
@@ -63,23 +63,6 @@
             background-color: #ccc;
         }
 
-        .button {
-            display: block;
-            /* organiza os botões de cima para baixo */
-            background-color: #4CAF50;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-bottom: 20px;
-            /* adiciona um espaçamento de 20px entre os botões */
-        }
-
-        .button:hover {
-            background-color: #3e8e41;
-        }
-
         /* Ícones nos botões */
         .button-icon {
             margin-right: 8px;
@@ -93,14 +76,14 @@
     <div class="fixed-buttons">
         <!-- Botão de Alternância de Tema -->
         <button class="toggle-button" id="theme-toggle">
-            <span class="button-icon">🌙</span>Modo Escuro
-        </button>
+            <span class="button-icon">🌙</span>Modo Escuro</button>
+            <button onclick="window.location.href='index2.html'">Página 2</button>
+            <button onclick="window.location.href='index3.html'">Página 3</button>
+
     </div>
     <div class="fixed-buttons">
-        <button onclick="window.location.href='index2.html'">Página 2</button>
     </div>
     <div class="fixed-buttons">
-        <button onclick="window.location.href='index3.html'">Página 3</button>
     </div>
 
 
