@@ -83,14 +83,13 @@
     <!-- Seu conteúdo existente -->
     <script src="https://cdn.botpress.cloud/webchat/v3.6/inject.js"></script>
     <script>
-      window.botpress.on("webchat:initialized", () => {
+      window.botpress.on("webchat:initialized", async () => {
         console.log("Webchat has been initialized. Loading user...");
-        window.botpress.updateUser({
+        await window.botpress.updateUser({
           data: {
             firstName: "Rafael",
             lastName: "Esposito",
             email: "rafael@example.com",
-            id: "123456789"
           },
         });
       });
