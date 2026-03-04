@@ -85,16 +85,44 @@
     <script
       src="https://files.bpcontent.cloud/2025/07/25/16/20250725163424-LLGP1S04.js"
     ></script>
+    <script>
       window.botpress.on("webchat:initialized", async () => {
-        window.botpress.updateUser({
-          userKey: "7112912",
-          data: {
-            firstName: "Rafael",
-            lastName: "Esposito",
-            email: "rafael@example.com",
-          },
-        });
-      })
+        try {
+          await window.botpress.updateUser({
+            userKey: "7112912",
+            data: {
+              firstName: "Rafael",
+              lastName: "Esposito",
+              email: "rafael@example.com",
+            },
+          });
+        } catch (error) {
+          console.error("Erro ao enviar dados do usuário para o Botpress:", error);
+        }
+      });
+    </script>
+
+    <!-- Scripts para funcionalidade dos botões -->
+    <script>
+      // Seleção dos elementos
+      const toggleButton = document.getElementById("theme-toggle");
+      const bodyElement = document.body;
+
+      // Função para atualizar o texto do botão de tema
+      function updateThemeButton() {
+        if (bodyElement.classList.contains("light-mode")) {
+          toggleButton.innerHTML =
+            '<span class="button-icon">🌙</span>Modo Escuro';
+        } else {
+          toggleButton.innerHTML =
+            '<span class="button-icon">☀️</span>Modo Claro';
+        }
+      }
+
+      // Verificar preferência salva no localStorage
+      if (localStorage.getItem("theme") === "light") {
+        bodyElement.classList.add("light-mode");
+      }
 
       updateThemeButton();
 
@@ -108,17 +136,6 @@
           localStorage.setItem("theme", "dark");
         }
         updateThemeButton();
-      });
-
-      window.botpress.on("webchat:initialized", () => {
-        window.botpress.updateUser({
-          data: {
-            firstName: "Rafael",
-            lastName: "Esposito",
-            email: "rafael@example.com",
-            id: "7112912",
-          },
-        });
       });
     </script>
   </body>
