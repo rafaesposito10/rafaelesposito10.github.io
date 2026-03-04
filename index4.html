@@ -1,119 +1,137 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hyperflow Embed</title>
     <style>
-        /* Estilos padrão (Modo Escuro) */
-        body {
-            background-color: #333;
-            color: #fff;
-            transition: background-color 0.3s, color 0.3s;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
+      /* Estilos padrão (Modo Escuro) */
+      body {
+        background-color: #333;
+        color: #fff;
+        transition:
+          background-color 0.3s,
+          color 0.3s;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+      }
 
-        /* Contêiner para os botões fixos */
-        .fixed-buttons {
-            position: fixed;
-            top: 20px;
-            left: 20px; /* Alinhado à esquerda */
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 1000; /* Assegura que os botões fiquem sobre outros elementos */
-        }
+      /* Contêiner para os botões fixos */
+      .fixed-buttons {
+        position: fixed;
+        top: 20px;
+        left: 20px; /* Alinhado à esquerda */
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 1000; /* Assegura que os botões fiquem sobre outros elementos */
+      }
 
-        /* Estilos para os botões de alternância e limpeza */
-        .fixed-buttons button {
-            background-color: #444;
-            border: none;
-            color: #fff;
-            padding: 10px 15px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s, color 0.3s;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+      /* Estilos para os botões de alternância e limpeza */
+      .fixed-buttons button {
+        background-color: #444;
+        border: none;
+        color: #fff;
+        padding: 10px 15px;
+        cursor: pointer;
+        border-radius: 5px;
+        transition:
+          background-color 0.3s,
+          color 0.3s;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-        .fixed-buttons button:hover {
-            background-color: #555;
-        }
+      .fixed-buttons button:hover {
+        background-color: #555;
+      }
 
-        /* Modo Claro */
-        body.light-mode {
-            background-color: #f0f0f0;
-            color: #000;
-        }
+      /* Modo Claro */
+      body.light-mode {
+        background-color: #f0f0f0;
+        color: #000;
+      }
 
-        .light-mode .fixed-buttons button {
-            background-color: #ddd;
-            color: #000;
-        }
+      .light-mode .fixed-buttons button {
+        background-color: #ddd;
+        color: #000;
+      }
 
-        .light-mode .fixed-buttons button:hover {
-            background-color: #ccc;
-        }
+      .light-mode .fixed-buttons button:hover {
+        background-color: #ccc;
+      }
 
-        /* Ícones nos botões */
-        .button-icon {
-            margin-right: 8px;
-            font-size: 16px;
-        }
+      /* Ícones nos botões */
+      .button-icon {
+        margin-right: 8px;
+        font-size: 16px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <!-- Contêiner para os Botões Fixos -->
     <div class="fixed-buttons">
-        <!-- Botão de Alternância de Tema -->
-        <button class="toggle-button" id="theme-toggle">
-            <span class="button-icon">🌙</span>Modo Escuro
-        </button>
+      <!-- Botão de Alternância de Tema -->
+      <button class="toggle-button" id="theme-toggle">
+        <span class="button-icon">🌙</span>Modo Escuro
+      </button>
     </div>
 
     <!-- Seu conteúdo existente -->
     <script src="https://cdn.botpress.cloud/webchat/v3.6/inject.js"></script>
-    <script src="https://files.bpcontent.cloud/2025/07/25/16/20250725163424-LLGP1S04.js" defer></script>
-    
-
+    <script
+      src="https://files.bpcontent.cloud/2025/07/25/16/20250725163424-LLGP1S04.js"
+      defer
+    ></script>
     <!-- Scripts para funcionalidade dos botões -->
     <script>
-        // Seleção dos elementos
-        const toggleButton = document.getElementById('theme-toggle');
-        const bodyElement = document.body;
+      // Seleção dos elementos
+      const toggleButton = document.getElementById("theme-toggle");
+      const bodyElement = document.body;
 
-        // Função para atualizar o texto do botão de tema
-        function updateThemeButton() {
-            if (bodyElement.classList.contains('light-mode')) {
-                toggleButton.innerHTML = '<span class="button-icon">🌙</span>Modo Escuro';
-            } else {
-                toggleButton.innerHTML = '<span class="button-icon">☀️</span>Modo Claro';
-            }
+      // Função para atualizar o texto do botão de tema
+      function updateThemeButton() {
+        if (bodyElement.classList.contains("light-mode")) {
+          toggleButton.innerHTML =
+            '<span class="button-icon">🌙</span>Modo Escuro';
+        } else {
+          toggleButton.innerHTML =
+            '<span class="button-icon">☀️</span>Modo Claro';
         }
+      }
 
-        // Verificar preferência salva no localStorage
-        if (localStorage.getItem('theme') === 'light') {
-            bodyElement.classList.add('light-mode');
+      // Verificar preferência salva no localStorage
+      if (localStorage.getItem("theme") === "light") {
+        bodyElement.classList.add("light-mode");
+      }
+
+      updateThemeButton();
+
+      // Evento de clique para alternar o tema
+      toggleButton.addEventListener("click", () => {
+        bodyElement.classList.toggle("light-mode");
+        // Salvar preferência no localStorage
+        if (bodyElement.classList.contains("light-mode")) {
+          localStorage.setItem("theme", "light");
+        } else {
+          localStorage.setItem("theme", "dark");
         }
-
         updateThemeButton();
+      });
 
-        // Evento de clique para alternar o tema
-        toggleButton.addEventListener('click', () => {
-            bodyElement.classList.toggle('light-mode');
-            // Salvar preferência no localStorage
-            if (bodyElement.classList.contains('light-mode')) {
-                localStorage.setItem('theme', 'light');
-            } else {
-                localStorage.setItem('theme', 'dark');
-            }
-            updateThemeButton();
+      window.botpress.on("webchat:initialized", () => {
+        window.botpress.updateUser({
+          data: {
+            firstName: "Rafael",
+            lastName: "Esposito",
+            email: "rafael@example.com",
+            id: "7112912",
+          },
         });
+      });
     </script>
-</body>
+  </body>
 </html>
