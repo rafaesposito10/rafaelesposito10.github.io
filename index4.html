@@ -82,27 +82,15 @@
 
     <!-- Seu conteúdo existente -->
     <script src="https://cdn.botpress.cloud/webchat/v3.6/inject.js"></script>
-    <script
-      src="https://files.bpcontent.cloud/2025/07/25/16/20250725163424-LLGP1S04.js"
-      defer
-    ></script>
     <script>
       window.botpress.on("webchat:initialized", async () => {
-        try {
-          await window.botpress.updateUser({
-            userKey: "7112912",
-            data: {
-              firstName: "Rafael",
-              lastName: "Esposito",
-              email: "rafael@example.com",
+          window.botpress.updateUser({
+              data: {
+                  firstName: "Rafael",
+                  lastName: "Esposito",
+                  email: "rafael@example.com",
+                  id: "7112912",
             },
-          });
-
-          const user = await window.botpress.getUser();
-          console.log("Usuário enviado para o Botpress:", user);
-        } catch (error) {
-          console.error("Erro ao enviar dados do usuário para o Botpress:", error);
-        }
       });
     </script>
     <!-- Scripts para funcionalidade dos botões -->
