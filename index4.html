@@ -138,6 +138,38 @@
       .light-mode .user-status {
         color: #333;
       }
+
+      .bpFabWrapper,
+      .bpWebchat {
+        transition:
+          filter 0.3s,
+          background-color 0.3s,
+          color 0.3s;
+      }
+
+      body:not(.light-mode) .bpWebchat {
+        color-scheme: dark;
+      }
+
+      body.light-mode .bpWebchat {
+        color-scheme: light;
+      }
+
+      body:not(.light-mode) .bpWebchat,
+      body:not(.light-mode) .bpHeaderContainer,
+      body:not(.light-mode) .bpComposer,
+      body:not(.light-mode) .bpMessageList {
+        background-color: #1f1f1f !important;
+        color: #f5f5f5 !important;
+      }
+
+      body.light-mode .bpWebchat,
+      body.light-mode .bpHeaderContainer,
+      body.light-mode .bpComposer,
+      body.light-mode .bpMessageList {
+        background-color: #fff !important;
+        color: #111 !important;
+      }
     </style>
   </head>
   <body>
@@ -220,6 +252,31 @@
         userStatus.textContent = text;
       }
 
+      async function sincronizarTemaBotpress() {
+        const themeMode = document.body.classList.contains("light-mode")
+          ? "light"
+          : "dark";
+
+        try {
+          if (typeof window.botpress.setConfig === "function") {
+            await window.botpress.setConfig({
+              configuration: {
+                themeMode,
+              },
+            });
+            return;
+          }
+
+          if (typeof window.botpress.updateSettings === "function") {
+            await window.botpress.updateSettings({ themeMode });
+          }
+        } catch (error) {
+          console.warn("Não foi possível sincronizar tema do Botpress:", error);
+        }
+      }
+
+      window.sincronizarTemaBotpress = sincronizarTemaBotpress;
+
       async function aplicarUsuario(id, email) {
         if (typeof window.botpress.setUser === "function") {
           await window.botpress.setUser({
@@ -266,6 +323,8 @@
       window.botpress.on("webchat:initialized", async () => {
         webchatInitialized = true;
         setStatus("Webchat pronto.");
+
+        await sincronizarTemaBotpress();
 
         if (savedUser.id && savedUser.email) {
           try {
@@ -329,6 +388,10 @@
           localStorage.setItem("theme", "dark");
         }
         updateThemeButton();
+
+        if (typeof window.sincronizarTemaBotpress === "function") {
+          window.sincronizarTemaBotpress();
+        }
       });
     </script>
   </body>
