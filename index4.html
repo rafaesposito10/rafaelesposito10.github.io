@@ -69,6 +69,60 @@
         margin-right: 8px;
         font-size: 16px;
       }
+
+      .user-switcher {
+        background: rgba(0, 0, 0, 0.25);
+        border-radius: 8px;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 260px;
+      }
+
+      .user-switcher label {
+        font-size: 12px;
+      }
+
+      .user-switcher input {
+        border: 1px solid #555;
+        background-color: #222;
+        color: #fff;
+        border-radius: 5px;
+        padding: 8px;
+        font-size: 13px;
+      }
+
+      .user-switcher input::placeholder {
+        color: #aaa;
+      }
+
+      .user-switcher .switch-user-button {
+        width: 100%;
+      }
+
+      .user-status {
+        font-size: 12px;
+        color: #ddd;
+      }
+
+      .light-mode .user-switcher {
+        background: rgba(255, 255, 255, 0.85);
+      }
+
+      .light-mode .user-switcher input {
+        border-color: #bbb;
+        background-color: #fff;
+        color: #000;
+      }
+
+      .light-mode .user-switcher input::placeholder {
+        color: #777;
+      }
+
+      .light-mode .user-status {
+        color: #333;
+      }
     </style>
   </head>
   <body>
@@ -78,22 +132,103 @@
       <button class="toggle-button" id="theme-toggle">
         <span class="button-icon">🌙</span>Modo Escuro
       </button>
+
+      <div class="user-switcher">
+        <label for="client-id">ID do cliente</label>
+        <input id="client-id" type="text" placeholder="ex: cliente_123" />
+
+        <label for="client-email">Email do cliente</label>
+        <input
+          id="client-email"
+          type="email"
+          placeholder="cliente@exemplo.com"
+        />
+
+        <button class="switch-user-button" id="switch-user-btn">
+          Trocar usuário
+        </button>
+        <div class="user-status" id="user-status">Aguardando webchat...</div>
+      </div>
     </div>
 
     <!-- Seu conteúdo existente -->
     <script src="https://cdn.botpress.cloud/webchat/v3.6/inject.js"></script>
     <script src="https://files.bpcontent.cloud/2025/07/25/16/20250725163424-LLGP1S04.js"></script>
     <script>
-      window.botpress.on("webchat:initialized", async () => {
-        console.log("Webchat has been initialized. Loading user...");
+      const clientIdInput = document.getElementById("client-id");
+      const clientEmailInput = document.getElementById("client-email");
+      const switchUserBtn = document.getElementById("switch-user-btn");
+      const userStatus = document.getElementById("user-status");
+      const STORAGE_KEY = "bp-selected-user";
+      let webchatInitialized = false;
+
+      const savedUser = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      clientIdInput.value = savedUser.id || "";
+      clientEmailInput.value = savedUser.email || "";
+
+      function setStatus(text) {
+        userStatus.textContent = text;
+      }
+
+      async function aplicarUsuario(id, email) {
+        if (typeof window.botpress.setUser === "function") {
+          await window.botpress.setUser({
+            id,
+            data: { email },
+          });
+          return;
+        }
+
         await window.botpress.updateUser({
           data: {
-            firstName: "Rafael",
-            lastName: "Esposito",
-            email: "rafael@example.com",
+            externalId: id,
+            email,
           },
         });
+      }
+
+      async function trocarUsuario() {
+        const id = clientIdInput.value.trim();
+        const email = clientEmailInput.value.trim();
+
+        if (!id || !email) {
+          setStatus("Preencha ID e email.");
+          return;
+        }
+
+        if (!webchatInitialized) {
+          setStatus("Webchat ainda não inicializou.");
+          return;
+        }
+
+        setStatus("Trocando usuário...");
+
+        try {
+          await aplicarUsuario(id, email);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ id, email }));
+          setStatus(`Usuário ativo: ${id}`);
+        } catch (error) {
+          console.error(error);
+          setStatus("Erro ao trocar usuário.");
+        }
+      }
+
+      window.botpress.on("webchat:initialized", async () => {
+        webchatInitialized = true;
+        setStatus("Webchat pronto.");
+
+        if (savedUser.id && savedUser.email) {
+          try {
+            await aplicarUsuario(savedUser.id, savedUser.email);
+            setStatus(`Usuário ativo: ${savedUser.id}`);
+          } catch (error) {
+            console.error(error);
+            setStatus("Erro ao restaurar usuário salvo.");
+          }
+        }
       });
+
+      switchUserBtn.addEventListener("click", trocarUsuario);
     </script>
     <script>
       // Seleção dos elementos
