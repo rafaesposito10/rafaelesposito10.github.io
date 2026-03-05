@@ -93,6 +93,15 @@
         font-size: 13px;
       }
 
+      .user-switcher select {
+        border: 1px solid #555;
+        background-color: #222;
+        color: #fff;
+        border-radius: 5px;
+        padding: 8px;
+        font-size: 13px;
+      }
+
       .user-switcher input::placeholder {
         color: #aaa;
       }
@@ -116,6 +125,12 @@
         color: #000;
       }
 
+      .light-mode .user-switcher select {
+        border-color: #bbb;
+        background-color: #fff;
+        color: #000;
+      }
+
       .light-mode .user-switcher input::placeholder {
         color: #777;
       }
@@ -134,6 +149,21 @@
       </button>
 
       <div class="user-switcher">
+        <label for="fixed-users">Usuários fixos</label>
+        <select id="fixed-users">
+          <option value="">Selecione um usuário</option>
+          <option
+            value='{"id":"732213","email":"rafael.esposito@eduzz.com.br"}'
+          >
+            732213 - rafael.esposito@eduzz.com.br
+          </option>
+          <option
+            value='{"id":"21708962","email":"lucas.souza@eduzz.com.br"}'
+          >
+            21708962 - lucas.souza@eduzz.com.br
+          </option>
+        </select>
+
         <label for="client-id">ID do cliente</label>
         <input id="client-id" type="text" placeholder="ex: cliente_123" />
 
@@ -157,6 +187,7 @@
     <script>
       const clientIdInput = document.getElementById("client-id");
       const clientEmailInput = document.getElementById("client-email");
+      const fixedUsersSelect = document.getElementById("fixed-users");
       const switchUserBtn = document.getElementById("switch-user-btn");
       const userStatus = document.getElementById("user-status");
       const STORAGE_KEY = "bp-selected-user";
@@ -165,6 +196,25 @@
       const savedUser = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
       clientIdInput.value = savedUser.id || "";
       clientEmailInput.value = savedUser.email || "";
+
+      function sincronizarDropdownComUsuario(id, email) {
+        const option = Array.from(fixedUsersSelect.options).find((item) => {
+          if (!item.value) {
+            return false;
+          }
+
+          try {
+            const parsed = JSON.parse(item.value);
+            return parsed.id === id && parsed.email === email;
+          } catch {
+            return false;
+          }
+        });
+
+        fixedUsersSelect.value = option ? option.value : "";
+      }
+
+      sincronizarDropdownComUsuario(savedUser.id || "", savedUser.email || "");
 
       function setStatus(text) {
         userStatus.textContent = text;
@@ -229,6 +279,22 @@
       });
 
       switchUserBtn.addEventListener("click", trocarUsuario);
+
+      fixedUsersSelect.addEventListener("change", () => {
+        if (!fixedUsersSelect.value) {
+          return;
+        }
+
+        try {
+          const selectedUser = JSON.parse(fixedUsersSelect.value);
+          clientIdInput.value = selectedUser.id;
+          clientEmailInput.value = selectedUser.email;
+          setStatus(`Usuário selecionado: ${selectedUser.id}`);
+        } catch (error) {
+          console.error(error);
+          setStatus("Erro ao selecionar usuário fixo.");
+        }
+      });
     </script>
     <script>
       // Seleção dos elementos
