@@ -222,13 +222,82 @@
       const fixedUsersSelect = document.getElementById("fixed-users");
       const switchUserBtn = document.getElementById("switch-user-btn");
       const userStatus = document.getElementById("user-status");
-      const STORAGE_KEY = "bp-selected-user";
+      const STORAGE_KEY = "app-selected-user";
+      const PENDING_SWITCH_KEY = "app-pending-user-switch";
+      const SNAPSHOT_PREFIX = "app-bp-snapshot:";
       let webchatInitialized = false;
       let webchatReady = false;
 
       const savedUser = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
       clientIdInput.value = savedUser.id || "";
       clientEmailInput.value = savedUser.email || "";
+
+      function isBotpressStorageKey(key) {
+        if (!key || key.startsWith("app-")) {
+          return false;
+        }
+
+        return /(botpress|bpcloud|bp-webchat|bp_webchat|^bp[:_-])/i.test(key);
+      }
+
+      function readBotpressStorageEntries() {
+        const entries = {};
+
+        for (let index = 0; index < localStorage.length; index += 1) {
+          const key = localStorage.key(index);
+          if (!isBotpressStorageKey(key)) {
+            continue;
+          }
+
+          entries[key] = localStorage.getItem(key);
+        }
+
+        return entries;
+      }
+
+      function clearBotpressStorageEntries() {
+        const keysToRemove = [];
+
+        for (let index = 0; index < localStorage.length; index += 1) {
+          const key = localStorage.key(index);
+          if (isBotpressStorageKey(key)) {
+            keysToRemove.push(key);
+          }
+        }
+
+        keysToRemove.forEach((key) => localStorage.removeItem(key));
+      }
+
+      function saveSnapshotForUser(userId) {
+        if (!userId) {
+          return;
+        }
+
+        const entries = readBotpressStorageEntries();
+        localStorage.setItem(`${SNAPSHOT_PREFIX}${userId}`, JSON.stringify(entries));
+      }
+
+      function restoreSnapshotForUser(userId) {
+        clearBotpressStorageEntries();
+
+        const snapshotRaw = localStorage.getItem(`${SNAPSHOT_PREFIX}${userId}`);
+        if (!snapshotRaw) {
+          return false;
+        }
+
+        try {
+          const snapshot = JSON.parse(snapshotRaw);
+          Object.entries(snapshot).forEach(([key, value]) => {
+            if (typeof value === "string") {
+              localStorage.setItem(key, value);
+            }
+          });
+          return true;
+        } catch (error) {
+          console.error("[Botpress][Sessão] Snapshot inválido para usuário:", userId, error);
+          return false;
+        }
+      }
 
       function sincronizarDropdownComUsuario(id, email) {
         const option = Array.from(fixedUsersSelect.options).find((item) => {
@@ -291,7 +360,21 @@
           return;
         }
 
+        if (typeof window.botpress.config === "function") {
+          window.botpress.config({
+            user: {
+              userKey: id,
+              data: {
+                externalId: id,
+                email,
+              },
+            },
+          });
+          return;
+        }
+
         await window.botpress.updateUser({
+          userKey: id,
           data: {
             externalId: id,
             email,
@@ -318,27 +401,87 @@
         try {
           if (typeof window.botpress.close === "function") {
             window.botpress.close();
+            console.info("[Botpress][Sessão] Chat fechado antes da troca de usuário.");
           }
 
           const hasSetUser = typeof window.botpress.setUser === "function";
+          let isSameUser = false;
+          let currentId = "";
+          let currentEmail = "";
+
+          if (hasSetUser) {
+            console.info(
+              `[Botpress][Sessão] setUser disponível para o usuário ${id}. O Botpress decidirá entre retomar conversa existente ou criar nova.`
+            );
+          }
+
+          if (!hasSetUser && typeof window.botpress.getUser === "function") {
+            const currentUser = await window.botpress.getUser();
+            currentId =
+              currentUser?.data?.externalId ||
+              currentUser?.userKey ||
+              currentUser?.id ||
+              "";
+            currentEmail = currentUser?.data?.email || currentUser?.email || "";
+
+            isSameUser = currentId === id && currentEmail === email;
+
+            console.info(
+              `[Botpress][Sessão] Fallback sem setUser. Usuário atual: ${currentId || "(vazio)"} | ${currentEmail || "(vazio)"}. Usuário solicitado: ${id} | ${email}. Decisão: ${isSameUser ? "manter sessão atual" : "trocar contexto do usuário e tentar retomar histórico existente"}.`
+            );
+          }
+
+          if (!hasSetUser && !isSameUser) {
+            if (currentId) {
+              saveSnapshotForUser(currentId);
+              console.info(
+                `[Botpress][Sessão] Snapshot local salvo para usuário ${currentId}.`
+              );
+            }
+
+            const restored = restoreSnapshotForUser(id);
+            console.info(
+              `[Botpress][Sessão] Snapshot ${restored ? "restaurado" : "não encontrado"} para usuário ${id}.`
+            );
+
+            localStorage.setItem(
+              PENDING_SWITCH_KEY,
+              JSON.stringify({ id, email, at: Date.now() })
+            );
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ id, email }));
+
+            setStatus(`Usuário ativo: ${id} (recarregando contexto...)`);
+            console.info(
+              `[Botpress][Sessão] Recarregando página para aplicar contexto do usuário ${id}.`
+            );
+            window.location.reload();
+            return;
+          }
 
           await aplicarUsuario(id, email);
 
-          if (!hasSetUser && webchatReady) {
-            if (typeof window.botpress.restartConversation === "function") {
-              await window.botpress.restartConversation();
-            }
+          if (!hasSetUser && webchatReady && isSameUser) {
+            console.info(
+              `[Botpress][Sessão] Mantendo conversa atual para retomar sessão existente do usuário ${id}.`
+            );
+          } else if (!hasSetUser) {
+            console.info(
+              `[Botpress][Sessão] Aplicado userKey=${id}. Não foi feito restartConversation para evitar forçar nova sessão; o Botpress irá retomar histórico existente desse usuário ou criar uma sessão nova se não houver.`
+            );
           }
 
           if (typeof window.botpress.open === "function") {
             window.botpress.open();
+            console.info("[Botpress][Sessão] Chat reaberto após a troca de usuário.");
           }
 
           localStorage.setItem(STORAGE_KEY, JSON.stringify({ id, email }));
           setStatus(
             hasSetUser
-              ? `Usuário ativo: ${id} (sessão retomada/criada)`
-              : `Usuário ativo: ${id} (nova sessão iniciada)`
+              ? `Usuário ativo: ${id} (retomada automática ou nova)`
+              : isSameUser
+                ? `Usuário ativo: ${id} (sessão mantida)`
+                : `Usuário ativo: ${id} (retomada automática ou nova)`
           );
         } catch (error) {
           console.error(error);
@@ -350,12 +493,34 @@
         webchatInitialized = true;
         setStatus("Webchat pronto.");
 
+        const pendingSwitch = JSON.parse(
+          localStorage.getItem(PENDING_SWITCH_KEY) || "null"
+        );
+        const userToApply =
+          pendingSwitch && pendingSwitch.id && pendingSwitch.email
+            ? pendingSwitch
+            : savedUser;
+
         await sincronizarTemaBotpress();
 
-        if (savedUser.id && savedUser.email) {
+        if (userToApply.id && userToApply.email) {
           try {
-            await aplicarUsuario(savedUser.id, savedUser.email);
-            setStatus(`Usuário ativo: ${savedUser.id}`);
+            await aplicarUsuario(userToApply.id, userToApply.email);
+            localStorage.setItem(
+              STORAGE_KEY,
+              JSON.stringify({ id: userToApply.id, email: userToApply.email })
+            );
+            sincronizarDropdownComUsuario(userToApply.id, userToApply.email);
+            clientIdInput.value = userToApply.id;
+            clientEmailInput.value = userToApply.email;
+            setStatus(`Usuário ativo: ${userToApply.id}`);
+
+            if (pendingSwitch?.id) {
+              console.info(
+                `[Botpress][Sessão] Contexto do usuário ${pendingSwitch.id} aplicado após recarregamento.`
+              );
+              localStorage.removeItem(PENDING_SWITCH_KEY);
+            }
           } catch (error) {
             console.error(error);
             setStatus("Erro ao restaurar usuário salvo.");
