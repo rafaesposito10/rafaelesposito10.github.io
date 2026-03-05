@@ -224,6 +224,7 @@
       const userStatus = document.getElementById("user-status");
       const STORAGE_KEY = "bp-selected-user";
       let webchatInitialized = false;
+      let webchatReady = false;
 
       const savedUser = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
       clientIdInput.value = savedUser.id || "";
@@ -258,8 +259,8 @@
           : "dark";
 
         try {
-          if (typeof window.botpress.setConfig === "function") {
-            await window.botpress.setConfig({
+          if (typeof window.botpress.config === "function") {
+            window.botpress.config({
               configuration: {
                 themeMode,
               },
@@ -267,8 +268,12 @@
             return;
           }
 
-          if (typeof window.botpress.updateSettings === "function") {
-            await window.botpress.updateSettings({ themeMode });
+          if (typeof window.botpress.setConfig === "function") {
+            await window.botpress.setConfig({
+              configuration: {
+                themeMode,
+              },
+            });
           }
         } catch (error) {
           console.warn("Não foi possível sincronizar tema do Botpress:", error);
@@ -308,12 +313,33 @@
           return;
         }
 
-        setStatus("Trocando usuário...");
+        setStatus("Trocando usuário e recarregando chat...");
 
         try {
+          if (typeof window.botpress.close === "function") {
+            window.botpress.close();
+          }
+
+          const hasSetUser = typeof window.botpress.setUser === "function";
+
           await aplicarUsuario(id, email);
+
+          if (!hasSetUser && webchatReady) {
+            if (typeof window.botpress.restartConversation === "function") {
+              await window.botpress.restartConversation();
+            }
+          }
+
+          if (typeof window.botpress.open === "function") {
+            window.botpress.open();
+          }
+
           localStorage.setItem(STORAGE_KEY, JSON.stringify({ id, email }));
-          setStatus(`Usuário ativo: ${id}`);
+          setStatus(
+            hasSetUser
+              ? `Usuário ativo: ${id} (sessão retomada/criada)`
+              : `Usuário ativo: ${id} (nova sessão iniciada)`
+          );
         } catch (error) {
           console.error(error);
           setStatus("Erro ao trocar usuário.");
@@ -335,6 +361,10 @@
             setStatus("Erro ao restaurar usuário salvo.");
           }
         }
+      });
+
+      window.botpress.on("webchat:ready", () => {
+        webchatReady = true;
       });
 
       switchUserBtn.addEventListener("click", trocarUsuario);
